@@ -1,0 +1,55 @@
+STM_COMMON=.
+
+CFLAGS  = -c -mthumb -DHSE_VALUE=8000000 -mcpu=cortex-m4 -DSTM32PLUS_F4
+CFLAGS += -I.
+CFLAGS += -I$(STM_COMMON)/Utilities/STM32F4-Discovery
+CFLAGS += -I$(STM_COMMON)/Libraries/CMSIS/Include 
+CFLAGS += -I$(STM_COMMON)/Libraries/CMSIS/ST/STM32F4xx/Include
+CFLAGS += -I$(STM_COMMON)/Libraries/STM32F4xx_StdPeriph_Driver/inc
+CFLAGS += -I$(STM_COMMON)/Libraries/STM32_USB_Device_Library/Class/cdc/inc
+CFLAGS += -I$(STM_COMMON)/Libraries/STM32_USB_Device_Library/Core/inc
+CFLAGS += -I$(STM_COMMON)/Libraries/STM32_USB_OTG_Driver/inc
+
+vpath %.c $(STM_COMMON)/Libraries/STM32F4xx_StdPeriph_Driver/src \
+	$(STM_COMMON)/Utilities/STM32F4-Discovery \
+	$(STM_COMMON)/Libraries/STM32_USB_Device_Library/Class/cdc/src \
+	$(STM_COMMON)/Libraries/STM32_USB_Device_Library/Core/src \
+	$(STM_COMMON)/Libraries/STM32_USB_OTG_Driver/src
+
+.PHONY: proj
+
+all:
+	$(CC) $(CFLAGS) -o stm32f4_discovery.o ./Utilities/STM32F4-Discovery/stm32f4_discovery.c
+	$(CC) $(CFLAGS) -o stm32f4xx_rcc.o    ./Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.c
+	$(CC) $(CFLAGS) -o stm32f4xx_gpio.o   ./Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.c
+	$(CC) $(CFLAGS) -o stm32f4xx_syscfg.o ./Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_syscfg.c
+	$(CC) $(CFLAGS) -o stm32f4xx_exti.o   ./Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_exti.c
+	$(CC) $(CFLAGS) -o misc.o             ./Libraries/STM32F4xx_StdPeriph_Driver/src/misc.c
+	$(CC) $(CFLAGS) -o syscalls.o         syscalls.c
+	$(CC) $(CFLAGS) -o usbd_cdc_vcp.o     usbd_cdc_vcp.c
+	$(CC) $(CFLAGS) -o usbd_usr.o         usbd_usr.c
+	$(CC) $(CFLAGS) -o usbd_desc.o        usbd_desc.c
+	$(CC) $(CFLAGS) -o usb_bsp.o          usb_bsp.c
+	$(CC) $(CFLAGS) -o stm32f4xx_it.o     stm32f4xx_it.c
+	$(CC) $(CFLAGS) -o usbd_cdc_core.o    ./Libraries/STM32_USB_Device_Library/Class/cdc/src/usbd_cdc_core.c
+	$(CC) $(CFLAGS) -o usb_dcd.o          ./Libraries/STM32_USB_OTG_Driver/src/usb_dcd.c
+	$(CC) $(CFLAGS) -o usbd_ioreq.o       ./Libraries/STM32_USB_Device_Library/Core/src/usbd_ioreq.c
+	$(CC) $(CFLAGS) -o usbd_req.o         ./Libraries/STM32_USB_Device_Library/Core/src/usbd_req.c
+	$(CC) $(CFLAGS) -o usb_core.o         ./Libraries/STM32_USB_OTG_Driver/src/usb_core.c
+	$(CC) $(CFLAGS) -o usbd_core.o        ./Libraries/STM32_USB_Device_Library/Core/src/usbd_core.c
+	$(CC) $(CFLAGS) -o usb_dcd_int.o      ./Libraries/STM32_USB_OTG_Driver/src/usb_dcd_int.c
+
+#	~/lib/gcc-arm-none-eabi-4_7-2013q2/bin/arm-none-eabi-ar rc print.a stm32f4xx_rcc.o stm32f4xx_gpio.o stm32f4xx_syscfg.o stm32f4xx_exti.o  misc.o syscalls.o usbd_cdc_vcp.o usbd_usr.o usbd_desc.o usb_bsp.o stm32f4xx_it.o usbd_cdc_core.o usb_dcd.o usbd_ioreq.o usbd_req.o usb_core.o usbd_core.o usb_dcd_int.o  stm32f4_discovery.o
+
+	$(CPP) $(CFLAGS) -o test.o test.c
+	$(CC) $(CFLAGS) -o startup.o          ./Libraries/CMSIS/ST/STM32F4xx/Source/Templates/TrueSTUDIO/startup_stm32f4xx.s
+	$(CC) $(CFLAGS) -o system_stm32f4xx.o system_stm32f4xx.c
+
+	$(CPP) -o test.elf -Xlinker --gc-sections -mthumb -g3 -gdwarf-2 -mcpu=cortex-m4 -Tstm32_flash.ld -Wl,-wrap,__aeabi_unwind_cpp_pr0 -Wl,-wrap,__aeabi_unwind_cpp_pr1 -Wl,-wrap,__aeabi_unwind_cpp_pr2 test.o startup.o system_stm32f4xx.o stm32f4xx_rcc.o stm32f4xx_gpio.o stm32f4xx_syscfg.o stm32f4xx_exti.o  misc.o syscalls.o usbd_cdc_vcp.o usbd_usr.o usbd_desc.o usb_bsp.o stm32f4xx_it.o usbd_cdc_core.o usb_dcd.o usbd_ioreq.o usbd_req.o usb_core.o usbd_core.o usb_dcd_int.o  stm32f4_discovery.o
+	$(OBJCOPY) -O binary test.elf test.bin
+
+clean:
+	rm *.o *.elf *.bin
+
+burn:
+	$(STLINK)/st-flash write test.bin 0x8000000
