@@ -77,12 +77,8 @@ template<class T> inline cycleiter<T>::cycleiter(pyiter<T> *iterable) {
 
 template<class T> T cycleiter<T>::next() {
     if (!this->exhausted) {
-        try  {
             this->cache.push_back(this->iter->next());
             return this->cache.back();
-        } catch (StopIteration *) {
-            this->exhausted = true;
-        }
     }
     assert(this->cache.size());
     const T& value = this->cache[position];
@@ -153,11 +149,7 @@ template<class T> void chainiter<T>::push_iter(pyiter<T> *iterable) {
 
 template<class T> T chainiter<T>::next() {
     for (; ; ) {
-        try  {
             return this->iters[iterable]->next();
-        } catch (StopIteration *) {
-            ++this->iterable;
-        }
     }
 }
 
@@ -509,11 +501,7 @@ template<class R, TP> R imapiter##N<R, FP>::next() {                            
     if (this->exhausted) {                                                                               \
     }                                                                                                    \
                                                                                                          \
-    try  {                                                                                               \
         return this->function(CP);                                                                       \
-    } catch (StopIteration *) {                                                                          \
-        this->exhausted = true;                                                                          \
-    }                                                                                                    \
 }                                                                                                        \
                                                                                                          \
 template<class R, TP> inline imapiter##N<R, FP> *imap(int /* iterable_count */, R (*function)(FP), DP) { \
@@ -699,12 +687,8 @@ template<class T, class U> tuple2<T, U> *izipiter<T, U>::next() {
     }
 
     tuple2<T, U> *tuple = new tuple2<T, U>;
-    try  {
         tuple->first = this->first->next();
         tuple->second = this->second->next();
-    } catch (StopIteration *) {
-        this->exhausted = true;
-    }
 
     return tuple;
 }
@@ -747,11 +731,7 @@ template<class T> tuple2<T, T> *izipiter<T, T>::next() {
 
     tuple2<T, T> *tuple = new tuple2<T, T>;
     for (unsigned int i = 0; i < this->iters.size(); ++i) {
-        try  {
             tuple->units.push_back(this->iters[i]->next());
-        } catch (StopIteration *) {
-            this->exhausted = true;
-        }
     }
 
     return tuple;
@@ -819,15 +799,7 @@ template<class T, class U> tuple2<T, U> *izip_longestiter<T, U>::next() {
     if (this->first_exhausted) {
         tuple->first = this->fillvalue;
     } else {
-        try {
             tuple->first = this->first->next();
-        } catch (StopIteration *) {
-            if (this->second_exhausted) {
-                this->exhausted = true;
-            }
-            this->first_exhausted = true;
-            tuple->first = this->fillvalue;
-        }
 
         if (this->second_exhausted) {
             tuple->second = (U)this->fillvalue;
@@ -835,15 +807,7 @@ template<class T, class U> tuple2<T, U> *izip_longestiter<T, U>::next() {
         }
     }
 
-    try {
         tuple->second = this->second->next();
-    } catch (StopIteration *) {
-        if (this->first_exhausted) {
-            this->exhausted = true;
-        }
-        this->second_exhausted = true;
-        tuple->second = (U)this->fillvalue;
-    }
 
     return tuple;
 }
@@ -886,15 +850,8 @@ template<class T> tuple2<T, T> *izip_longestiter<T, T>::next() {
     tuple2<T, T> *tuple = new tuple2<T, T>;
     for (unsigned int i = 0; i < this->iters.size(); ++i) {
         if (!this->exhausted_iter[i]) {
-            try  {
                 tuple->units.push_back(this->iters[i]->next());
                 continue;
-            } catch (StopIteration *) {
-                ++this->exhausted;
-                if (this->exhausted == this->iters.size()) {
-                }
-                this->exhausted_iter[i] = 1;
-            }
         }
         tuple->units.push_back(this->fillvalue);
     }
@@ -962,11 +919,7 @@ template<class T, class U> inline productiter<T, U>::productiter(pyiter<T> *iter
     #define CACHE_VALUES(TYPE, ID)                            \
         __iter<TYPE> *iter##ID = iterable##ID->__iter__();    \
         for (; ; ) {                                          \
-            try {                                             \
                 this->values##ID.push_back(iter##ID->next()); \
-            } catch (StopIteration *) {                       \
-                break;                                        \
-            }                                                 \
         }                                                     \
         if (this->values##ID.empty()) {                       \
             this->exhausted = true;                           \
@@ -1045,11 +998,7 @@ template<class T> void productiter<T, T>::push_iter(pyiter<T> *iterable) {
     // (could be improved with static polymorphism and partial specialization on templates templates)
     __iter<T> *iter = iterable->__iter__();
     for (; ; ) {
-        try {
             this->values.back().push_back(iter->next());
-        } catch (StopIteration *) {
-            break;
-        }
     }
 
     if (!this->values.back().size()) {
@@ -1186,11 +1135,7 @@ template<class T> inline permutationsiter<T>::permutationsiter(pyiter<T> *iterab
     // (could be improved with static polymorphism and partial specialization on templates templates)
     __iter<T> *iter = iterable->__iter__();
     for (; ; ) {
-        try  {
             this->cache.push_back(iter->next());
-        } catch (StopIteration *) {
-            break;
-        }
     }
     this->len = this->cache.size();
 
@@ -1293,11 +1238,7 @@ template<class T> inline combinationsiter<T>::combinationsiter(pyiter<T> *iterab
     // (could be improved with static polymorphism and partial specialization on templates templates)
     __iter<T> *iter = iterable->__iter__();
     for (; ; ) {
-        try  {
             this->cache.push_back(iter->next());
-        } catch (StopIteration *) {
-            break;
-        }
     }
     this->len = this->cache.size();
 
@@ -1393,11 +1334,7 @@ template<class T> inline combinations_with_replacementiter<T>::combinations_with
     // (could be improved with static polymorphism and partial specialization on templates templates)
     __iter<T> *iter = iterable->__iter__();
     for (; ; ) {
-        try  {
             this->cache.push_back(iter->next());
-        } catch (StopIteration *) {
-            break;
-        }
     }
     this->len = this->cache.size();
 

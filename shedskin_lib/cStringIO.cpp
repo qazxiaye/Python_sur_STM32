@@ -26,10 +26,11 @@ str * StringI::readline(int n) {
     size_t nl = s->unit.find('\n', pos);
     if(nl != std::string::npos) {
         int tbr = nl - pos + 1;
-        return read(n < 0 ? tbr : std::min(tbr, n));
+        //return read(n < 0 ? tbr : std::min(tbr, n));
     } else {
-        return read(n);
+        //return read(n);
     }
+	return NULL;
 }
 
 void *StringI::seek(__ss_int i, __ss_int w) {

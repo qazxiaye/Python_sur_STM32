@@ -419,7 +419,8 @@ list<str *> *re_object::__splitfind(str *subj, __ss_int maxn, char onlyfind, __s
 
 list<str *> *re_object::split(str *subj, __ss_int maxn)
 {
-    return __splitfind(subj, maxn, 0, 0);
+    //return __splitfind(subj, maxn, 0, 0);
+	return NULL;
 }
 
 list<str *> *re_object::findall(str *subj, __ss_int flags)
@@ -718,7 +719,8 @@ list<str *> *__splitfind_once(str *pat, str *subj, __ss_int maxn, char onlyfind,
 
 list<str *> *split(str *pat, str *subj, __ss_int maxn)
 {
-    return __splitfind_once(pat, subj, maxn, 0, 0);
+    //return __splitfind_once(pat, subj, maxn, 0, 0);
+	return NULL;
 }
 
 list<str *> *findall(str *pat, str *subj, __ss_int flags)

@@ -144,7 +144,7 @@ void *sleep(double s) {
     time.tv_sec = seconds;
     time.tv_nsec = nanosecs;
 
-    nanosleep(&time, NULL);
+    //nanosleep(&time, NULL);
 
     return NULL;
 }
@@ -161,10 +161,7 @@ double mktime(struct_time *tuple) {
 
 double mktime(tuple2<__ss_int, __ss_int> *tuple) {
     struct_time *st;
-    try {
         st = new struct_time(tuple);
-    } catch(...) {
-    }
     return (double)::mktime(tuple2tm(st));
 }
 
@@ -228,10 +225,7 @@ str *strftime(str *format) {
 
 str *strftime(str *format, tuple2<__ss_int, __ss_int> *tuple) {
     struct_time *st;
-    try {
-        st = new struct_time(tuple);
-    } catch (...) {
-    }
+    st = new struct_time(tuple);
     return strftime(format, st);
 }
 
@@ -884,7 +878,7 @@ struct_time *strptime(str *string, str *format) {
     /* XXX check if newer MinGW supports this */
     if(!strptime(string->unit.c_str(), format->unit.c_str(), &time_tuple))
 #else
-    tm time_tuple = {0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0};
+    tm time_tuple;
     if(!::strptime(string->unit.c_str(), format->unit.c_str(), &time_tuple))
 #endif
     return tm2tuple(&time_tuple);

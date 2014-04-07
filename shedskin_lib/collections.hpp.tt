@@ -38,14 +38,16 @@ public:
     }
 
     A pop() {
-        if(units.empty());
+        if(units.empty())
+            throw new IndexError(new str("pop from an empty deque"));
         A x = units.back();
         units.pop_back();
         return x;
     }
 
     A popleft() {
-        if(units.empty());
+        if(units.empty())
+            throw new IndexError(new str("pop from an empty deque"));
         A x = units.front();
         units.pop_front();
         return x;
@@ -128,6 +130,7 @@ public:
            }
            iter++;
        }
+       throw new ValueError(new str("hops"));
        return NULL;
    }
 
@@ -150,7 +153,7 @@ public:
    }
 
    __ss_int truth() {
-       return 0;
+       return !units.empty();
    }
 
    deque<A> *__copy__() {
@@ -181,7 +184,8 @@ public:
     }
 
     T next() {
-        if(i == size);
+        if(i == size)
+            throw new StopIteration();
         return p->units[i++];
     }
 };
@@ -199,6 +203,7 @@ public:
     T next() {
         if(i >= 0)
             return p->units[i--];
+        throw new StopIteration();
     }
 };
 
@@ -244,6 +249,7 @@ public:
             this->__setitem__(k, v);
             return v;
         }
+        throw new KeyError(repr(k));
     }
 
     void *__addtoitem__(K key, V value) { /* XXX */
@@ -253,6 +259,8 @@ public:
         if (entry->use != active) {
             if(func)
                 this->__setitem__(key, __add(func(), value));
+            else
+                throw new KeyError(repr(key));
         } else
             entry->value = __add(entry->value, value);
         return NULL;
@@ -264,6 +272,9 @@ public:
 
 #ifdef __SS_BIND
     defaultdict(PyObject *p) { /* XXX merge with dict */
+        if(!PyDict_Check(p))
+            throw new TypeError(new str("error in conversion to Shed Skin (dictionary expected)"));
+
         this->__class__ = cl_dict;
         PyObject *key, *value;
 

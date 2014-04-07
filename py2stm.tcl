@@ -44,6 +44,8 @@ proc Usage {} {
 	colorShow "\[-d\] \[-b\]" blue 1
 	colorShow "-p" blue 1
 	puts " py_file "
+	showInfo "\[-d\]" blue " : Debug Mode, will surpport printf in the project."
+	showInfo "\[-b\]" blue " : Burn  Mode, will burn the program on the card when finish compile."
 	puts ""
 
     showInfo "Example:" yellow " $pname -d -p /home/share/test.py"
@@ -116,6 +118,14 @@ file mkdir $DirName
 #set j [string first ";" $cpp_contenu $i]
 #set str [string range $cpp_contenu $i $j]
 #set cpp_contenu [string replace $cpp_contenu $i $j [string range $str 22 [expr [string length $str]-3]]()\;]
+
+
+
+
+
+
+
+
 
 
 if {$DEBUG == 1} {
@@ -256,6 +266,41 @@ close $hpp_index
 set make_index [open Makefile w]
 puts $make_index $makefile_contenu
 close $make_index
+
+
+set is_exception ""
+catch {set is_exception [exec grep -w catch ./${FILE_NAME}.cpp]} msg
+if {$is_exception eq ""} {
+	catch {set is_exception [exec grep -w throw ./${FILE_NAME}.cpp]} msg
+}
+if {$is_exception eq ""} {
+	catch {set is_exception [exec grep -w ASSERT ./${FILE_NAME}.cpp]} msg
+}
+
+if {$is_exception ne ""} {
+	set f_new_cpp [open ./${FILE_NAME}.cpp.tmp w]
+	set f_cpp [open ./${FILE_NAME}.cpp r]
+	while {![eof $f_cpp]} {
+		gets $f_cpp line
+		set pos_catch [string first "catch" $line]
+
+		if {$pos_catch!=-1} {
+			set index -1
+			set pos [expr $pos_catch - 2]
+
+			while {$index ne $pos} {
+				gets $f_cpp line
+				set index [string first \175 $line]
+			}
+		} elseif {[string first "try" $line]==-1 && [string first "throw" $line]==-1  && [string first "ASSERT" $line]==-1} {
+			puts $f_new_cpp $line
+		}
+	}
+
+	close $f_cpp
+	close $f_new_cpp
+	file rename -force ./${FILE_NAME}.cpp.tmp ./${FILE_NAME}.cpp
+}
 
 #-----------------------make and execute-----------------------------------------------------
 colorShow "Compiling..." yellow

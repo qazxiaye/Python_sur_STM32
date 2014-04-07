@@ -91,17 +91,17 @@ void *mmap::__init__(int __ss_fileno_, __ss_int length_, __ss_int flags_, __ss_i
 {
     if (length_ < 0)
     {
-        throw new OverflowError(const_2);
+        //throw new OverflowError(const_2);
     }
     if (offset_ < 0)
     {
-        throw new OverflowError(const_3);
+        //throw new OverflowError(const_3);
     }
     if ((access_ != ACCESS_DEFAULT and
             (flags_ != MAP_SHARED or
              (prot_ != (PROT_WRITE | PROT_READ)))))
     {
-        throw new ValueError(const_4);
+        //throw new ValueError(const_4);
     }
     if (access_ == ACCESS_READ)
     {
@@ -124,7 +124,7 @@ void *mmap::__init__(int __ss_fileno_, __ss_int length_, __ss_int flags_, __ss_i
     }
     else
     {
-        throw new ValueError(const_5);
+        //throw new ValueError(const_5);
     }
     if (prot_ == PROT_READ)
     {
@@ -141,14 +141,14 @@ void *mmap::__init__(int __ss_fileno_, __ss_int length_, __ss_int flags_, __ss_i
         fd = dup(__ss_fileno_);
         if (fd == -1)
         {
-            throw new IOError();
+            //throw new IOError();
         }
         if(length_ == 0)
         {
             struct stat buf;
             if (fstat(fd, &buf) == -1)
             {
-                throw new IOError();
+                //throw new IOError();
             }
             length_ = buf.st_size;
         }
@@ -160,7 +160,7 @@ void *mmap::__init__(int __ss_fileno_, __ss_int length_, __ss_int flags_, __ss_i
 
     if (m_begin == iterator(-1))
     {
-        throw IOError();
+        //throw IOError();
     }
 
     m_position = m_begin;
@@ -192,7 +192,7 @@ __ss_int mmap::flush(__ss_int offset, __ss_int size)
     __raise_if_closed();
     if (::msync(m_begin + offset, __subscript(size), MS_SYNC) == -1)
     {
-        throw new IOError();
+        //throw new IOError();
     }
     return 0;
 }
@@ -210,12 +210,12 @@ void *mmap::resize(__ss_int new_size)
 #endif // __NetBSD__
     if (m_begin == iterator(-1))
     {
-        throw new IOError();
+        //throw new IOError();
     }
     m_end = m_begin + size_t(new_size);
     m_position = std::min(m_position, m_end);
 #else // !HAVE_MREMAP
-    throw new NotImplementedError(const_15);
+    //throw new NotImplementedError(const_15);
 #endif // HAVE_MREMAP
     return NULL;
 }
@@ -224,11 +224,11 @@ void *mmap::__init__(int __ss_fileno_, __ss_int length_, str *tagname_, __ss_int
 {
     if (length_ < 0)
     {
-        throw new OverflowError(const_2);
+        //throw new OverflowError(const_2);
     }
     if (offset_ < 0)
     {
-        throw new OverflowError(const_3);
+        //throw new OverflowError(const_3);
     }
     // Taken from Python 2.7
     DWORD flProtect, dwDesiredAccess;
@@ -255,8 +255,6 @@ void *mmap::__init__(int __ss_fileno_, __ss_int length_, str *tagname_, __ss_int
         flProtect = PAGE_WRITECOPY;
         dwDesiredAccess = FILE_MAP_COPY;
         break;
-    default:
-        throw new ValueError(const_5);
     }
 
     if (__ss_fileno_ != -1 and __ss_fileno_ != 0)
@@ -264,7 +262,7 @@ void *mmap::__init__(int __ss_fileno_, __ss_int length_, str *tagname_, __ss_int
         fh = HANDLE(_get_osfhandle(__ss_fileno_));
         if (fh == HANDLE(-1))
         {
-            throw new ValueError(const_16);
+            //throw new ValueError(const_16);
         }
         /* Win9x appears to need us seeked to zero */
         lseek(__ss_fileno_, 0, SEEK_SET);
@@ -287,7 +285,7 @@ void *mmap::__init__(int __ss_fileno_, __ss_int length_, str *tagname_, __ss_int
                     FALSE, /* inherited by child processes? */
                     DUPLICATE_SAME_ACCESS))   /* options */
         {
-            throw new IOError();
+            //throw new IOError();
         }
         if (length_)
         {
@@ -302,7 +300,7 @@ void *mmap::__init__(int __ss_fileno_, __ss_int length_, str *tagname_, __ss_int
             if (low == INVALID_FILE_SIZE and
                     (dwErr = GetLastError()) != NO_ERROR)
             {
-                throw new ValueError(const_17);
+                //throw new ValueError(const_17);
             }
 #if SIZEOF_SIZE_T > 4
             size = (size_t(high)<<32) + low;
@@ -343,7 +341,7 @@ void *mmap::__init__(int __ss_fileno_, __ss_int length_, str *tagname_, __ss_int
                                    tagname);
     if (map_handle == NULL)
     {
-        throw new IOError();
+        //throw new IOError();
     }
 
     m_begin = static_cast<iterator>(MapViewOfFile(map_handle,
@@ -353,7 +351,7 @@ void *mmap::__init__(int __ss_fileno_, __ss_int length_, str *tagname_, __ss_int
                                     size));
     if (m_begin == NULL)
     {
-        throw new IOError();
+        //throw new IOError();
     }
     /* set the initial position */
     m_position = m_begin;
@@ -420,7 +418,7 @@ void *mmap::resize(__ss_int new_size)
                      tagname);
     if (map_handle != NULL)
     {
-        throw new IOError();
+        //throw new IOError();
     }
 
     m_begin = static_cast<iterator>(MapViewOfFile(map_handle,
@@ -431,7 +429,7 @@ void *mmap::resize(__ss_int new_size)
     if (m_begin == NULL)
     {
         CloseHandle(map_handle);
-        throw new IOError();
+        //throw new IOError();
     }
     m_end = m_begin + size_t(new_size);
     m_position = std::min(m_position, m_end);
@@ -464,7 +462,7 @@ void *mmap::move(__ss_int destination, __ss_int source, __ss_int count)
             destination < 0 or destination > length or
             (destination + count) > length)
     {
-        throw new ValueError(const_1);
+        //throw new ValueError(const_1);
     }
     memmove(m_begin + destination, m_begin + source, count);
     return NULL;
@@ -483,7 +481,7 @@ str *mmap::read(__ss_int size)
         m_position += size;
         if (m_position < at)
         {
-            throw new OverflowError(const_14);
+            //throw new OverflowError(const_14);
         }
         if (m_position >= m_end)
         {
@@ -571,8 +569,6 @@ void *mmap::seek(__ss_int offset, __ss_int whence)
         }
         m_position = m_end + offset;
         break;
-    default: // Error
-        throw new ValueError(const_12);
     }
     return NULL;
 }
@@ -592,7 +588,7 @@ __ss_int mmap::size()
                when indeed its size equals INVALID_FILE_SIZE */
             DWORD error = GetLastError();
             if (error != NO_ERROR)
-                throw IOError();
+                //throw IOError();
         }
         size = (((uint64_t)high)<<32) + low;
         return __ss_int(size);
@@ -611,7 +607,7 @@ __ss_int mmap::size()
         struct stat buf;
         if (fstat(fd, &buf) == -1)
         {
-            throw new IOError();
+            //throw new IOError();
         }
         return buf.st_size;
     }
@@ -630,7 +626,7 @@ void *mmap::write(str *string)
     size_t length = string->unit.size();
     if (m_position + length > m_end)
     {
-        throw new ValueError(const_14);
+        //throw new ValueError(const_14);
     }
     memcpy(m_position, string->unit.data(), length);
     m_position += length;
@@ -643,11 +639,11 @@ void *mmap::write_byte(str *string)
     __raise_if_closed_or_not_writable();
     if (string == 0 or string->unit.size() != 1)
     {
-        throw new ValueError(const_8);
+        //throw new ValueError(const_8);
     }
     if (m_position + 1 > m_end)
     {
-        throw new ValueError(const_14);
+        //throw new ValueError(const_14);
     }
     *m_position++ = string->unit[0];
     return NULL;
@@ -658,7 +654,7 @@ __ss_bool mmap::__contains__(str *string)
     __raise_if_closed_or_not_readable();
     if (string == 0 or string->unit.size() != 1)
     {
-        throw new ValueError(const_8);
+        //throw new ValueError(const_8);
     }
     return __mbool(find(string, 0) != -1);
 }
@@ -687,7 +683,7 @@ void *mmap::__setitem__(__ss_int index, str *character)
     size_t id = __subscript(index);
     if (character->unit.size() != 1)
     {
-        throw new IndexError(const_8);
+        //throw new IndexError(const_8);
     }
     m_begin[id] = character->unit[0];
     return NULL;
@@ -753,7 +749,7 @@ void *mmap::__raise_if_closed()
 {
     if (closed)
     {
-        throw new ValueError(const_11);
+        //throw new ValueError(const_11);
     }
     return NULL;
 }
@@ -767,7 +763,7 @@ void *mmap::__raise_if_closed_or_not_readable()
     if (access and access != ACCESS_READ)
 #endif /* WIN32 */
     {
-        throw new TypeError(const_0);
+        //throw new TypeError(const_0);
     }
     return NULL;
 }
@@ -781,14 +777,14 @@ void *mmap::__raise_if_closed_or_not_writable()
     if (access == ACCESS_READ)
 #endif /* WIN32 */
     {
-        throw new TypeError(const_9);
+        //throw new TypeError(const_9);
     }
     return NULL;
 }
 
 void *mmap::__seek_failed()
 {
-    throw new ValueError(const_14);
+    //throw new ValueError(const_14);
     return NULL;
 }
 
@@ -802,7 +798,7 @@ size_t mmap::__subscript(__ss_int index, bool include_end) const
     {
         if (not include_end or size_t(index) != __size())
         {
-            throw new IndexError(const_13);
+            //throw new IndexError(const_13);
         }
     }
     return index;
@@ -867,11 +863,11 @@ __ss_int mmap::__find(const __GC_STRING& needle, __ss_int start, __ss_int end, b
 
 str *__mmapiter::next()
 {
-    if (map->__eof())
-        throw new StopIteration();
+    if (map->__eof());
+        //throw new StopIteration();
     str* byte = map->read_byte();
-    if (map->__eof())
-        throw new StopIteration();
+    if (map->__eof());
+        //throw new StopIteration();
     return byte;
 }
 

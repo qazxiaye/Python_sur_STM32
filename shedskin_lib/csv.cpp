@@ -245,7 +245,6 @@ void *reader::parse_process_char(str *c) {
             this->state = IN_FIELD;
         }
         else {
-            throw ((new Error(__modct(const_13, 2, dialect->delimiter, dialect->quotechar))));
         }
     }
     else if ((this->state==EAT_CRNL)) {
@@ -255,7 +254,6 @@ void *reader::parse_process_char(str *c) {
             this->state = START_RECORD;
         }
         else {
-            throw ((new Error(const_14)));
         }
     }
     return 0;
@@ -285,7 +283,6 @@ list<str *> *reader::next() {
         str *__1;
         FOR_IN(c,line,1,2,3)
             if (__eq(c, const_7)) {
-                throw ((new Error(const_15)));
             }
             this->parse_process_char(c);
         END_FOR
@@ -302,7 +299,6 @@ list<str *> *reader::next() {
 
 void *reader::__init__(file *input_iter, str *dialect, str *delimiter, str *quotechar, __ss_int doublequote, __ss_int skipinitialspace, str *lineterminator, __ss_int quoting, str *escapechar, __ss_int strict) {
     if ((quoting==QUOTE_NONNUMERIC)) {
-        throw ((new ValueError(const_88)));
     }
     this->input_iter = input_iter;
     this->line_num = 0;
@@ -325,7 +321,6 @@ void *reader::parse_save_field() {
 void *reader::parse_add_char(str *c) {
     
     if ((len(this->field)>=_field_limit)) {
-        throw ((new Error(__modct(const_17, 1, ___box(_field_limit)))));
     }
     (this->field)->append(c);
     return NULL;
@@ -379,7 +374,6 @@ __ss_int writer::join_append_data(str *field, __ss_int quote_empty, __ss_int quo
             }
             if (want_escape) {
                 if ((!___bool(dialect->escapechar))) {
-                    throw ((new Error(const_18)));
                 }
                 (this->rec)->append(dialect->escapechar);
             }
@@ -389,7 +383,6 @@ __ss_int writer::join_append_data(str *field, __ss_int quote_empty, __ss_int quo
 
     if (__AND((!___bool(field)), quote_empty, 22)) {
         if ((dialect->quoting==QUOTE_NONE)) {
-            throw ((new Error(const_19)));
         }
         else {
             quoted = 1;
@@ -428,7 +421,7 @@ void *writer::writerow(list<str *> *seq) {
     END_FOR
 
     (this->rec)->append((this->dialect)->lineterminator);
-    (this->output_file)->write((const_16)->join(this->rec));
+    //(this->output_file)->write((const_16)->join(this->rec));
     return NULL;
 }
 
@@ -461,7 +454,6 @@ __ss_int writer::join_append(str *field, __ss_int quoted, __ss_int quote_empty) 
 
 void *writer::__init__(file *output_file, str *dialect, str *delimiter, str *quotechar, __ss_int doublequote, __ss_int skipinitialspace, str *lineterminator, __ss_int quoting, str *escapechar, __ss_int strict) {
     if ((quoting==QUOTE_NONNUMERIC)) {
-        throw ((new ValueError(const_88)));
     }
     this->output_file = output_file;
     this->dialect = _get_dialect(dialect, delimiter, quotechar, doublequote, skipinitialspace, lineterminator, quoting, escapechar, strict);
@@ -500,7 +492,6 @@ dict<str *, str *> *DictReader::next() {
     lf = len(this->getfieldnames());
     lr = len(row);
     if ((lf<lr)) {
-        throw ((new Error(const_20)));
     }
     else if ((lf>lr)) {
 
@@ -515,10 +506,7 @@ dict<str *, str *> *DictReader::next() {
 list<str *> *DictReader::getfieldnames() {
     
     if ((this->_fieldnames==NULL)) {
-        try {
             this->_fieldnames = (this->_reader)->next();
-        } catch (StopIteration *) {
-        }
     }
     this->line_num = (this->_reader)->line_num;
     return this->_fieldnames;
@@ -547,7 +535,6 @@ list<str *> *DictWriter::_dict_to_list(dict<str *, str *> *rowdict) {
     if (__eq(this->extrasaction, const_1)) {
         wrong_fields = list_comp_0(this, rowdict);
         if (___bool(wrong_fields)) {
-            throw ((new ValueError((const_21)->__add__((const_22)->join(wrong_fields)))));
         }
     }
     return list_comp_1(this, rowdict);
@@ -579,7 +566,6 @@ void *DictWriter::__init__(file *f, list<str *> *fieldnames, str *restval, str *
     this->fieldnames = fieldnames;
     this->restval = restval;
     if ((!(const_3)->__contains__(extrasaction->lower()))) {
-        throw ((new ValueError(__modct(const_23, 1, extrasaction))));
     }
     this->extrasaction = extrasaction;
     this->_writer = (new writer(f, dialect, delimiter, quotechar, doublequote, skipinitialspace, lineterminator, quoting, escapechar, strict));
@@ -685,7 +671,6 @@ Excel *_get_dialect(str *name, str *delimiter, str *quotechar, __ss_int doublequ
         dialect->delimiter = const_26;
     }
     else {
-        throw ((new Error(const_27)));
     }
     if ((delimiter!=NULL)) {
         dialect->delimiter = delimiter;

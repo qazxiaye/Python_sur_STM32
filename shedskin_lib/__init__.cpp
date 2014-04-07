@@ -7,7 +7,6 @@
 #include <sstream>
 #include <sys/stat.h>
 #include <stdio.h>
-#include <dirent.h>
 #include <errno.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -17,10 +16,7 @@
 #ifndef WIN32
 #include <sys/times.h>
 #include <sys/wait.h>
-#include <sys/utsname.h>
-#include <sys/statvfs.h>
 #include <grp.h>
-#include <sysexits.h>
 #endif
 
 #include <unistd.h>
@@ -49,7 +45,6 @@ extern char **environ;
 #endif
 
 #if !defined(__APPLE__) && !defined(__FreeBSD__) && !defined(__sun) && !defined(WIN32)
-#include <pty.h>
 #endif
 
 namespace __os__ {
@@ -60,9 +55,6 @@ dict<str *, str *> *__ss_environ;
 dict<str *, __ss_int> *pathconf_names, *confstr_names, *sysconf_names;
 
 struct stat sbuf;
-#ifndef WIN32
-struct statvfs vbuf;
-#endif
 
 const __ss_int MAXENTRIES = 4096; /* XXX fix functions that use this */
 
@@ -72,16 +64,9 @@ __ss_int __ss_F_OK, __ss_R_OK, __ss_W_OK, __ss_X_OK, __ss_NGROUPS_MAX, __ss_TMP_
 
 list<str *> *listdir(str *path) {
     list<str *> *r = new list<str *>();
-    DIR *dp;
     struct dirent *ep;
 
-    dp = opendir(path->unit.c_str());
 
-    while ((ep = readdir(dp)))
-        if(strcmp(ep->d_name, ".") && strcmp(ep->d_name, ".."))
-            r->append(new str(ep->d_name));
-
-    closedir (dp);
     return r;
 }
 
@@ -158,7 +143,7 @@ void *mkdir(str *path, __ss_int mode) {
 }
 
 void _exit(__ss_int code) {
-    ::exit(code);
+    //::exit(code);
 }
 
 void *makedirs(str *name, __ss_int mode) {
@@ -243,15 +228,11 @@ __ss_int __cstat::__getitem__(__ss_int i) {
         case 7: return __ss_st_atime;
         case 8: return __ss_st_mtime;
         case 9: return __ss_st_ctime;
-
-        default:
     }
 
     return 0;
 }
 
-
-/* class namedtuple */
 
 str *namedtuple::__repr__() {
     tuple2<__ss_int, __ss_int> *t = new tuple2<__ss_int, __ss_int>();
@@ -412,8 +393,8 @@ void *fdatasync(__ss_int f1) {
 #endif
 
 __ss_int open(str *name, __ss_int flags) { /* XXX mode argument */
-    __ss_int fp = ::open(name->unit.c_str(), flags);
-    return fp;
+    //__ss_int fp = ::open(name->unit.c_str(), flags);
+    return -1;
 }
 
 file* fdopen(__ss_int fd, str* mode, __ss_int) {
@@ -432,7 +413,7 @@ str *read(__ss_int fd, __ss_int n) {  /* XXX slowness */
     str *s = new str();
     __ss_int nr;
     for(__ss_int i=0; i<n; i++) {
-        nr = ::read(fd, &c, 1);
+        //nr = ::read(fd, &c, 1);
         if(nr == 0)
             break;
         s->unit += c;
@@ -517,7 +498,7 @@ void *utime(str *path, tuple2<double, double> *times) { HOPPA }
 
 #ifndef WIN32
 __ss_int __ss_WCOREDUMP(__ss_int status) {
-    return WCOREDUMP(status);
+    return -1;
 }
 
 __ss_int __ss_WEXITSTATUS(__ss_int status) {
@@ -525,7 +506,7 @@ __ss_int __ss_WEXITSTATUS(__ss_int status) {
 }
 
 __ss_int __ss_WIFCONTINUED(__ss_int status) {
-    return WIFCONTINUED(status);
+    return -1;
 }
 
 __ss_int __ss_WIFEXITED(__ss_int status) {
@@ -558,7 +539,7 @@ str *readlink(str *path) {
 
     while (1)
       {
-        char *buffer = (char *) GC_malloc (size);
+        char *buffer = (char *) malloc(size);
 	    __ss_int nchars = ::readlink(path->unit.c_str(), buffer, size);
     	if (nchars == -1) {
   	    }
@@ -672,7 +653,7 @@ void *chroot(str *path) {
 }
 
 str *ctermid() {
-    char term[L_ctermid];
+    char term[1];
     char *ptr = ::ctermid(term);
     return new str(ptr);
 }
@@ -687,9 +668,7 @@ str *ttyname(__ss_int fd) {
 }
 
 tuple2<str *, str *> *uname() {
-    struct utsname name;
-    ::uname(&name);
-    return new tuple2<str *, str *>(5, new str(name.sysname), new str(name.nodename), new str(name.release), new str(name.version), new str(name.machine));
+	return NULL;
 }
 
 list<__ss_int> *getgroups() {
@@ -708,8 +687,8 @@ void *setgroups(pyseq<__ss_int> *groups) {
 }
 
 __ss_int getsid(__ss_int pid) {
-    __ss_int nr = ::getsid(pid);
-    return nr;
+    //__ss_int nr = ::getsid(pid);
+    return -1;
 }
 __ss_int setsid() {
     __ss_int nr = ::setsid();
@@ -756,11 +735,11 @@ __ss_int fpathconf(__ss_int fd, __ss_int name) {
 }
 
 str *confstr(str *name) {
-    return confstr(confstr_names->__getitem__(name));
+    return NULL;
 }
 str *confstr(__ss_int name) {
     char buf[MAXENTRIES];
-    __ss_int size = ::confstr(name, buf, MAXENTRIES); /* XXX errors */
+    //__ss_int size = ::confstr(name, buf, MAXENTRIES); /* XXX errors */
     return new str(buf);
 }
 
@@ -799,16 +778,16 @@ __vfsstat::__vfsstat(__ss_int fd) {
 }
 
 void __vfsstat::fill_er_up() {
-    this->f_bsize = vbuf.f_bsize;
-    this->f_frsize = vbuf.f_frsize;
-    this->f_blocks = vbuf.f_blocks;
-    this->f_bfree = vbuf.f_bfree;
-    this->f_bavail = vbuf.f_bavail;
-    this->f_files = vbuf.f_files;
-    this->f_ffree = vbuf.f_ffree;
-    this->f_favail = vbuf.f_favail;
-    this->f_flag = vbuf.f_flag;
-    this->f_namemax = vbuf.f_namemax;
+//    this->f_bsize = vbuf.f_bsize;
+//    this->f_frsize = vbuf.f_frsize;
+//    this->f_blocks = vbuf.f_blocks;
+//    this->f_bfree = vbuf.f_bfree;
+//    this->f_bavail = vbuf.f_bavail;
+//    this->f_files = vbuf.f_files;
+//    this->f_ffree = vbuf.f_ffree;
+//    this->f_favail = vbuf.f_favail;
+//    this->f_flag = vbuf.f_flag;
+//    this->f_namemax = vbuf.f_namemax;
 }
 
 __ss_int __vfsstat::__len__() {
@@ -817,20 +796,6 @@ __ss_int __vfsstat::__len__() {
 
 __ss_int __vfsstat::__getitem__(__ss_int i) {
     i = __wrap(this, i);
-    switch(i) {
-        case 0: return vbuf.f_bsize;
-        case 1: return vbuf.f_frsize;
-        case 2: return vbuf.f_blocks;
-        case 3: return vbuf.f_bfree;
-        case 4: return vbuf.f_bavail;
-        case 5: return vbuf.f_files;
-        case 6: return vbuf.f_ffree;
-        case 7: return vbuf.f_favail;
-        case 8: return vbuf.f_flag;
-        case 9: return vbuf.f_namemax;
-
-        default:
-    }
 
     return 0;
 }
@@ -851,10 +816,10 @@ void *lseek(__ss_int fd, __ss_int pos, __ss_int how) {
 }
 
 str *urandom(__ss_int n) {
-    __ss_int fd = open(new str("/dev/urandom"), __ss_O_RDONLY);
-    str *s = read(fd, n);
-    close(fd);
-    return s;
+    //__ss_int fd = open(new str("/dev/urandom"), __ss_O_RDONLY);
+    //str *s = read(fd, n);
+    //close(fd);
+    return NULL;
 }
 
 __ss_bool access(str *path, __ss_int mode) {
@@ -893,13 +858,13 @@ file *tmpfile() {
 } */
 
 __ss_int __ss_makedev(__ss_int major, __ss_int minor) {
-    return makedev(major, minor);
+    return -1;
 }
 __ss_int __ss_major(__ss_int dev) {
-    return major(dev);
+    return -1;
 }
 __ss_int __ss_minor(__ss_int dev) {
-    return minor(dev);
+    return -1;
 }
 
 void *mknod(str *filename, __ss_int mode, __ss_int device) {
@@ -907,7 +872,7 @@ void *mknod(str *filename, __ss_int mode, __ss_int device) {
 }
 
 char **__exec_argvlist(list<str *> *args) {
-    char** argvlist = (char**)GC_malloc(sizeof(char*)*(args->__len__()+1));
+    char** argvlist = (char**)malloc(sizeof(char*)*(args->__len__()+1));
     for(__ss_int i = 0; i < args->__len__(); ++i) {
         argvlist[i] = (char *)(args->__getitem__(i)->unit.c_str());
     }
@@ -916,7 +881,7 @@ char **__exec_argvlist(list<str *> *args) {
 }
 
 char **__exec_envplist(dict<str *, str *> *env) {
-    char** envplist = (char**)GC_malloc(sizeof(char*)*(env->__len__()+1));
+    char** envplist = (char**)malloc(sizeof(char*)*(env->__len__()+1));
     list<tuple2<str *, str *> *> *items = env->items();
     for(__ss_int i=0; i < items->__len__(); i++) {
         envplist[i] = (char *)(__add_strs(3, items->__getitem__(i)->__getfirst__(), new str("="), items->__getitem__(i)->__getsecond__())->unit.c_str());
@@ -1148,7 +1113,7 @@ tuple2<file*,file*>* popen2(pyiter<str *> *cmd_i, str *, __ss_int) {
                 close(i);
         }
         execvp(cmd_l->__getitem__(0), cmd_l); /* XXX pass cmd_i? */
-        ::exit(1);
+        //::exit(1);
     }
 
     close(p2c->__getfirst__());
@@ -1189,7 +1154,7 @@ tuple2<file*,file*>* popen3(str* cmd, str*, __ss_int) {
         list<str*>* cmd_l = new list<str*>(3, new str("/bin/sh"),
                 new str("-c"), cmd);
         execvp(new str("/bin/sh"), cmd_l);
-        ::exit(1);
+        //::exit(1);
     }
 
     close(p2c->__getfirst__());
@@ -1221,7 +1186,7 @@ tuple2<file*,file*>* popen4(str* cmd, str*, __ss_int) {
         list<str*>* cmd_l = new list<str*>(3, new str("/bin/sh"),
                 new str("-c"), cmd);
         execvp(new str("/bin/sh"), cmd_l);
-        ::exit(1);
+        //::exit(1);
     }
 
     close(p2c->__getfirst__());

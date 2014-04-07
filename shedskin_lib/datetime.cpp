@@ -306,9 +306,7 @@ datetime *datetime::now(tzinfo *tzinfo) {
     datetime *r = utcnow();
     r->_tzinfo = tzinfo;
 	if(r->_tzinfo)
-		try {
 			return r->__add__(r->_tzinfo->utcoffset(r));
-		} catch (Exception *e) {return r;}
 	else
 		return r;
 }

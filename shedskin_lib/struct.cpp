@@ -189,7 +189,6 @@ __ss_int calcsize(str *fmt) {
             case 'x':
                 break;
             case 'P':
-            default:
         }
         result += ndigits * itemsize;
     }
@@ -288,10 +287,7 @@ str *pack(int, str *fmt, ...) {
                     else if(arg->__class__ == cl_float_)
                         value = ((float_ *)arg)->unit;
                     else {
-                        try {
                             value = arg->__index__();
-                        } catch(Exception *e) {
-                        }
                     }
                     fillbuf(c, value, order, itemsize);
                     for(unsigned int k=0; k<itemsize; k++)
@@ -405,7 +401,6 @@ str *pack(int, str *fmt, ...) {
                 pos += ndigits;
                 break;
             case 'P':
-            default:
         }
     }
     va_end(args);

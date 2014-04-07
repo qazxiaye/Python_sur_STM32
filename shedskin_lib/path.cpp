@@ -484,7 +484,6 @@ str *joinl(list<str *> *l) {
             path = b;
         }
         else {
-            ASSERT((len(path)>0), 0);
             if ((const_18)->__contains__(path->__getitem__(-1))) {
                 if ((___bool(b) && (const_18)->__contains__(b->__getitem__(0)))) {
                     path = path->__iadd__(b->__slice__(1, 1, 0, 0));

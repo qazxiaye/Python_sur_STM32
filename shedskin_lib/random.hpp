@@ -205,10 +205,10 @@ template <class A> list<A> *Random::sample(pyseq<A> *population, int k) {
 
     n = len(population);
     if ((!((0<=k)&&(k<=n)))) {
-        throw (new ValueError(const_5));
+        //throw (new ValueError(const_5));
     }
     if ((n==0)) {
-        throw (new ValueError(const_6));
+        //throw (new ValueError(const_6));
     }
     result = ((new list<A>(1, population->__getitem__(0))))->__mul__(k);
     if ((n<(6*k))) {
@@ -222,13 +222,7 @@ template <class A> list<A> *Random::sample(pyseq<A> *population, int k) {
 
     }
     else {
-        try {
             ((n>0) && ___bool((new tuple2<A, A>(3, population->__getitem__(0), population->__getitem__(__floordiv(n, 2)), population->__getitem__((n-1))))));
-        } catch (TypeError *) {
-            population = new tuple2<A,A>(population);
-        } catch (KeyError *) {
-            population = new tuple2<A,A>(population);
-        }
         selected = (new dict<int, A>());
 
         FAST_FOR(i,0,k,1,37,38)

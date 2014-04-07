@@ -333,11 +333,7 @@ void *RawConfigParser::_set(str *section, str *option, str *value) {
         sectdict = this->_defaults;
     }
     else {
-        try {
             sectdict = (this->_sections)->__getitem__(section);
-        } catch (KeyError *) {
-            throw ((new NoSectionError(section)));
-        }
     }
     sectdict->__setitem__(this->optionxform(option), value);
     return NULL;
@@ -365,11 +361,7 @@ __ss_bool RawConfigParser::remove_option(str *section, str *option) {
         sectdict = this->_defaults;
     }
     else {
-        try {
             sectdict = (this->_sections)->__getitem__(section);
-        } catch (KeyError *) {
-            throw ((new NoSectionError(section)));
-        }
     }
     option = this->optionxform(option);
     existed = sectdict->__contains__(option);
@@ -451,16 +443,16 @@ void *RawConfigParser::write(file *fp) {
     list<tuple2<str *, str *> *>::for_in_loop __123;
 
     if (___bool(this->_defaults)) {
-        fp->write(__modct(const_11, 1, DEFAULTSECT));
+        //fp->write(__modct(const_11, 1, DEFAULTSECT));
 
         FOR_IN(__19,(this->_defaults)->items(),20,22,123)
             __19 = __19;
             key = __19->__getfirst__();
             value = __19->__getsecond__();
-            fp->write(__modct(const_12, 2, key, (__str(value))->replace(const_13, const_14)));
+            //fp->write(__modct(const_12, 2, key, (__str(value))->replace(const_13, const_14)));
         END_FOR
 
-        fp->write(const_13);
+        //fp->write(const_13);
     }
 
     dict<str *, dict<str *, str *> *>::for_in_loop __3;
@@ -468,18 +460,18 @@ void *RawConfigParser::write(file *fp) {
     dict<str *, dict<str *, str *> *> *__1;
 
     FOR_IN(section,this->_sections,1,2,3)
-        fp->write(__modct(const_11, 1, section));
+        //fp->write(__modct(const_11, 1, section));
 
         FOR_IN(__26,((this->_sections)->__getitem__(section))->items(),27,29,123)
             __26 = __26;
             key = __26->__getfirst__();
             value = __26->__getsecond__();
             if (__ne(key, const_15)) {
-                fp->write(__modct(const_12, 2, key, (__str(value))->replace(const_13, const_14)));
+                //fp->write(__modct(const_12, 2, key, (__str(value))->replace(const_13, const_14)));
             }
         END_FOR
 
-        fp->write(const_13);
+        //fp->write(const_13);
     END_FOR
 
     return NULL;
@@ -495,7 +487,6 @@ void *RawConfigParser::add_section(str *section) {
 
 
     if ((this->_sections)->__contains__(section)) {
-        throw ((new DuplicateSectionError(section)));
     }
     this->_sections->__setitem__(section, (new dict<str *, str *>()));
     return NULL;
@@ -515,13 +506,11 @@ str *RawConfigParser::get(str *section, str *option, __ss_int, dict<str *, str *
     opt = this->optionxform(option);
     if ((!(this->_sections)->__contains__(section))) {
         if (__ne(section, DEFAULTSECT)) {
-            throw ((new NoSectionError(section)));
         }
         if ((this->_defaults)->__contains__(opt)) {
             return (this->_defaults)->__getitem__(opt);
         }
         else {
-            throw ((new NoOptionError(option,section)));
         }
     }
     else if (((this->_sections)->__getitem__(section))->__contains__(opt)) {
@@ -531,13 +520,13 @@ str *RawConfigParser::get(str *section, str *option, __ss_int, dict<str *, str *
         return (this->_defaults)->__getitem__(opt);
     }
     else {
-        throw ((new NoOptionError(option,section)));
     }
     return (str *)NULL;
 }
 
 list<str *> *RawConfigParser::read(str *filename) {
-    return read(new list<str *>(1, filename));
+    //return read(new list<str *>(1, filename));
+	return NULL;
 }
 
 list<str *> *RawConfigParser::read(list<str *> *filenames) {
@@ -563,11 +552,7 @@ list<str *> *RawConfigParser::read(list<str *> *filenames) {
     read_ok = (new list<str *>());
 
     FOR_IN(filename,filenames,7,9,123)
-        try {
             fp = open(filename);
-        } catch (IOError *) {
-            continue;
-        }
         this->_read(fp, filename);
         fp->close();
         read_ok->append(filename);
@@ -581,7 +566,6 @@ __ss_bool RawConfigParser::getboolean(str *section, str *option) {
 
     v = this->get(section, option, default_5, NULL);
     if ((!(RawConfigParser::_boolean_states)->__contains__(v->lower()))) {
-        throw ((new ValueError(__modct(const_16, 1, v))));
     }
     return __mbool((RawConfigParser::_boolean_states)->__getitem__(v->lower()));
 }
@@ -589,14 +573,7 @@ __ss_bool RawConfigParser::getboolean(str *section, str *option) {
 list<tuple2<str *, str *> *> *RawConfigParser::items(str *section) {
     dict<str *, str *> *d, *d2;
 
-    try {
         d2 = (this->_sections)->__getitem__(section);
-    } catch (KeyError *) {
-        if (__ne(section, DEFAULTSECT)) {
-            throw ((new NoSectionError(section)));
-        }
-        d2 = (new dict<str *, str *>());
-    }
     d = (this->_defaults)->copy();
     d->update(d2);
     if (d->__contains__(const_15)) {
@@ -663,7 +640,6 @@ void *RawConfigParser::_read(file *fp, str *fpname) {
                 optname = 0;
             }
             else if ((cursect==0)) {
-                throw ((new MissingSectionHeaderError(fpname,lineno,line)));
             }
             else {
                 mo = (RawConfigParser::OPTCRE)->match(line);
@@ -694,7 +670,6 @@ void *RawConfigParser::_read(file *fp, str *fpname) {
         }
     }
     if (___bool(e)) {
-        throw (e);
     }
     return NULL;
 }
@@ -715,11 +690,7 @@ list<str *> *RawConfigParser::options(str *section) {
     */
     dict<str *, str *> *opts;
 
-    try {
         opts = ((this->_sections)->__getitem__(section))->copy();
-    } catch (KeyError *) {
-        throw ((new NoSectionError(section)));
-    }
     opts->update(this->_defaults);
     if (opts->__contains__(const_15)) {
         opts->__delitem__(const_15);
@@ -748,18 +719,13 @@ str *ConfigParser::_interpolate(str *section, str *option, str *rawval, dict<str
         depth = (depth-1);
         if (value->__contains__(const_28)) {
             value = (ConfigParser::_KEYCRE)->sub(_interpolation_replace, value);
-            try {
                 value = __moddict(value, vars);
-            } catch (KeyError *e) {
-                throw ((new InterpolationMissingOptionError(option,section,rawval,const_17)));
-            }
         }
         else {
             break;
         }
     }
     if (value->__contains__(const_28)) {
-        throw ((new InterpolationDepthError(option,section,rawval)));
     }
     return value;
 }
@@ -785,13 +751,7 @@ str *ConfigParser::get(str *section, str *option, __ss_int raw, dict<str *, str 
     list<tuple2<str *, str *> *>::for_in_loop __123;
 
     d = (this->_defaults)->copy();
-    try {
         d->update((this->_sections)->__getitem__(section));
-    } catch (KeyError *) {
-        if (__ne(section, DEFAULTSECT)) {
-            throw ((new NoSectionError(section)));
-        }
-    }
     if (___bool(vars)) {
 
         FOR_IN(__46,vars->items(),47,49,123)
@@ -803,11 +763,7 @@ str *ConfigParser::get(str *section, str *option, __ss_int raw, dict<str *, str 
 
     }
     option = this->optionxform(option);
-    try {
         value = d->__getitem__(option);
-    } catch (KeyError *) {
-        throw ((new NoOptionError(option,section)));
-    }
     if (raw) {
         return value;
     }
@@ -840,13 +796,7 @@ list<tuple2<str *, str *> *> *ConfigParser::items(str *section, __ss_int raw, di
     list<tuple2<str *, str *> *>::for_in_loop __123;
 
     d = (this->_defaults)->copy();
-    try {
         d->update((this->_sections)->__getitem__(section));
-    } catch (KeyError *) {
-        if (__ne(section, DEFAULTSECT)) {
-            throw ((new NoSectionError(section)));
-        }
-    }
     if (___bool(vars)) {
 
         FOR_IN(__52,vars->items(),53,55,123)

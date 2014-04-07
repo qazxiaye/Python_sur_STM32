@@ -80,7 +80,7 @@ public:
                 return pathname;
                 __after_yield_0:;
             }
-            throw new StopIteration();
+            //throw new StopIteration();
         }
         __0 = __os__::__path__::split(pathname);
         dirname = __0->__getfirst__();
@@ -93,7 +93,7 @@ public:
                 __after_yield_1:;
             END_FOR
 
-            throw new StopIteration();
+            //throw new StopIteration();
         }
         if (has_magic(dirname)) {
             dirs = iglob(dirname);
@@ -127,7 +127,7 @@ public:
             END_FOR
 
         }
-        throw new StopIteration();
+        //throw new StopIteration();
     }
 
 };
@@ -152,11 +152,7 @@ list<str *> *glob1(str *dirname, str *pattern) {
     if ((!___bool(dirname))) {
         dirname = __os__::curdir;
     }
-    try {
         names = __os__::listdir(dirname);
-    } catch (__os__::error *) {
-        return ((list<str *> *)((new list<void *>())));
-    }
     if (__ne(pattern->__getitem__(0), const_2)) {
         n2 = (new list<str *>());
 

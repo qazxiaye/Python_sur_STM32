@@ -1,7 +1,6 @@
 /* Copyright 2005-2011 Mark Dufour and contributors; License Expat (See LICENSE) */
 
 #include <stdio.h>
-#include <sys/select.h>
 #include <math.h>
 #include <errno.h>
 #include "builtin.hpp"

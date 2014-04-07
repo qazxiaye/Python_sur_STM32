@@ -185,8 +185,6 @@ template<class T> array<T> *array<T>::__imul__(__ss_int n) {
 }
 
 template<class T> array<T> *array<T>::__add__(array<T> *b) {
-    if(this->typecode != b->typecode)
-        throw new TypeError(new str("bad argument type for built-in operation")); 
     array<T> *a = new array<T>(typecode);
     size_t s1 = this->units.size();
     size_t s2 = b->units.size();
@@ -197,8 +195,6 @@ template<class T> array<T> *array<T>::__add__(array<T> *b) {
 }
 
 template<class T> array<T> *array<T>::__iadd__(array<T> *b) {
-    if(this->typecode != b->typecode)
-        throw new TypeError(new str("bad argument type for built-in operation")); 
     size_t s1 = this->units.size();
     size_t s2 = b->units.size();
     this->units.resize(s1+s2);
@@ -221,7 +217,6 @@ template<class T> __ss_int array<T>::index(T t) {
     for(size_t i=0; i<len; i++)
         if(__eq(t, this->__getitem__(i)))
             return i;
-    throw new ValueError(new str("array.index(x): x not in list"));
 }
 template<> __ss_int array<str *>::index(str *t);
 
@@ -232,11 +227,7 @@ template<class T> void *array<T>::remove(T t) {
 
 template<class T> T array<T>::pop(__ss_int i) {
     size_t len = this->__len__();
-    if(len==0)
-        throw new IndexError(new str("pop from empty list"));
     if(i<0) i = len+i;
-    if(i<0 or i>=len)
-        throw new IndexError(new str("pop index out of range"));
     T t = this->__getitem__(i);
     this->units.erase(this->units.begin()+(i*itemsize), this->units.begin()+((i+1)*itemsize));
     return t;
@@ -365,8 +356,6 @@ template<class T> void *array<T>::fromfile(file *f, __ss_int n) {
     size_t bytes = (len/itemsize)*itemsize;
     for(size_t i=0; i<bytes; i++)
         units.push_back(s->unit[i]);
-    if (len < n*itemsize) 
-        throw new EOFError(new str("not enough items in file"));
 }
 
 template<class T> array<T> *array<T>::__copy__() {

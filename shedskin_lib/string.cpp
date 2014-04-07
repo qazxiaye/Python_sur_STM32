@@ -61,8 +61,7 @@ str *expandtabs(str *s, __ss_int width) {
 str *maketrans(str *frm, str *to) {
     str *r = new str(trans_table, 256);
     __ss_int l = len(frm);
-    if(l != len(to))
-        throw new ValueError(new str("maketrans arguments must have same length"));
+    if(l != len(to));
     for(__ss_int i=0; i<l; i++)
         r->unit[(unsigned char)frm->unit[i]] = to->unit[i];
     return r;

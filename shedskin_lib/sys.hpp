@@ -19,7 +19,6 @@ extern file *__ss_stdin, *__ss_stdout, *__ss_stderr;
 
 void __ss_exit();
 template<class T> void __ss_exit(T x) {
-    throw new SystemExit(x);
 }
 
 void *setrecursionlimit(__ss_int limit);
