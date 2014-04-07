@@ -302,6 +302,25 @@ if {$is_exception ne ""} {
 	file rename -force ./${FILE_NAME}.cpp.tmp ./${FILE_NAME}.cpp
 }
 
+set is_print2 ""
+catch {set is_print2 [exec grep -w print2 ./${FILE_NAME}.cpp]} msg
+if {$is_print2 ne ""} {
+	set f_new_cpp [open ./${FILE_NAME}.cpp.tmp w]
+	set f_cpp [open ./${FILE_NAME}.cpp r]
+	while {![eof $f_cpp]} {
+		gets $f_cpp line
+		set pos_catch [string first "catch" $line]
+
+		if {[string first "print2" $line]==-1} {
+			puts $f_new_cpp $line
+		}
+	}
+
+	close $f_cpp
+	close $f_new_cpp
+	file rename -force ./${FILE_NAME}.cpp.tmp ./${FILE_NAME}.cpp
+}
+
 #-----------------------make and execute-----------------------------------------------------
 colorShow "Compiling..." yellow
 catch {exec make} msg
