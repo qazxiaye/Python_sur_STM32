@@ -294,6 +294,8 @@ if {$is_exception ne ""} {
 			}
 		} elseif {[string first "try" $line]==-1 && [string first "throw" $line]==-1  && [string first "ASSERT" $line]==-1} {
 			puts $f_new_cpp $line
+		} else {
+			puts $f_new_cpp ";"
 		}
 	}
 
@@ -313,6 +315,8 @@ if {$is_print2 ne ""} {
 
 		if {[string first "print2" $line]==-1} {
 			puts $f_new_cpp $line
+		} else {
+			puts $f_new_cpp ";"
 		}
 	}
 
