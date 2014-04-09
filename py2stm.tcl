@@ -6,6 +6,8 @@ exec tclsh "$0" ${1+"$@"}
 set GCC_PATH "~/lib/gcc-arm-none-eabi-4_7-2013q2/bin"
 set STM32PLUS_LIB_PATH "/home/xavier/project/stm32/stm32plus/lib"
 set STLINK_PATH "/home/xavier/lib/stlink"
+
+
 set PY2STM_PATH [pwd]
 
 #--------------------------------------------------------------------------------
@@ -287,6 +289,9 @@ if {$is_exception ne ""} {
 		if {$pos_catch!=-1} {
 			set index -1
 			set pos [expr $pos_catch - 2]
+
+			puts -nonewline $f_new_cpp "//"
+			puts $f_new_cpp $line
 
 			while {$index ne $pos} {
 				gets $f_cpp line
