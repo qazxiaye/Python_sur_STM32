@@ -290,12 +290,17 @@ if {$is_exception ne ""} {
 
 			while {$index ne $pos} {
 				gets $f_cpp line
+
+				puts -nonewline $f_new_cpp "//"
+				puts $f_new_cpp $line
+
 				set index [string first \175 $line]
 			}
 		} elseif {[string first "try" $line]==-1 && [string first "throw" $line]==-1  && [string first "ASSERT" $line]==-1} {
 			puts $f_new_cpp $line
 		} else {
-			puts $f_new_cpp ";"
+			puts -nonewline $f_new_cpp "//"
+			puts $f_new_cpp $line
 		}
 	}
 
@@ -316,7 +321,8 @@ if {$is_print2 ne ""} {
 		if {[string first "print2" $line]==-1} {
 			puts $f_new_cpp $line
 		} else {
-			puts $f_new_cpp ";"
+			puts -nonewline $f_new_cpp "//"
+			puts $f_new_cpp $line
 		}
 	}
 
